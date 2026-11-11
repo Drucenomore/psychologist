@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Анонімне питання шкільному психологу</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eef1fb;
+    --paper: #ffffff;
+    --ink: #1f2a44;
+    --muted: #5a6585;
+    --line: #c9d1ee;
+    --accent: #ffc94d;
+    --accent-ink: #3a2a00;
+    --focus: #3b5bdb;
+    --note-bg: #fff6df;
+    --ok: #1b7f5c;
+    --err: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151a2e;
+      --paper: #1f2540;
+      --ink: #eef1fb;
+      --muted: #aab3d4;
+      --line: #384071;
+      --note-bg: #2a2a3d;
+      --focus: #8fa6ff;
+      --ok: #6fd6ad;
+      --err: #ff9a93;
+    }
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    font-family: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 18px;
+    padding: env(safe-area-inset-top, 0px) 16px env(safe-area-inset-bottom, 0px);
+  }
+  main { max-width: 640px; margin: 0 auto; padding: 40px 0 48px; }
+  h1 { font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1.15; margin: 0 0 14px; font-weight: 800; }
+  .lead { color: var(--muted); margin: 0 0 28px; }
+
+  form {
+    background: var(--paper);
+    border: 2px solid var(--line);
+    border-radius: 24px;
+    padding: 24px;
+  }
+  label, legend { font-weight: 800; display: block; margin-bottom: 8px; }
+  .hint { font-weight: 400; color: var(--muted); font-size: 0.9rem; }
+  fieldset { border: 0; padding: 0; margin: 0 0 22px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips input { position: absolute; opacity: 0; }
+  .chips label {
+    margin: 0; font-weight: 600; cursor: pointer;
+    border: 2px solid var(--line); border-radius: 999px; padding: 6px 16px;
+  }
+  .chips input:checked + label { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .chips input:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  select {
+    width: 100%; font: inherit; color: inherit;
+    border: 2px solid var(--line); border-radius: 14px;
+    padding: 12px 14px; background: var(--paper);
+  }
+  .check { display: flex; gap: 12px; align-items: flex-start; font-weight: 600; margin: 0; cursor: pointer; }
+  .check input { width: 22px; height: 22px; margin: 3px 0 0; flex: none; accent-color: var(--focus); }
+  .check input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  select:focus { outline: 3px solid var(--focus); outline-offset: 1px; }
+  textarea, input[type="text"] {
+    width: 100%; font: inherit; color: inherit;
+    border: 2px solid var(--line); border-radius: 14px;
+    padding: 12px 14px; background: transparent;
+  }
+  textarea { min-height: 180px; resize: vertical; background: var(--note-bg); }
+  textarea:focus, input[type="text"]:focus { outline: 3px solid var(--focus); outline-offset: 1px; }
+  .field { margin-bottom: 22px; }
+
+  button {
+    font: inherit; font-weight: 800; cursor: pointer;
+    background: var(--accent); color: var(--accent-ink);
+    border: 0; border-radius: 14px; padding: 14px 28px; width: 100%;
+  }
+  button:hover { filter: brightness(0.96); }
+  button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  button:disabled { opacity: 0.6; cursor: wait; }
+
+  .promise { color: var(--muted); font-size: 0.9rem; margin: 14px 0 0; text-align: center; }
+  #status { margin-top: 16px; font-weight: 600; text-align: center; min-height: 1.6em; }
+  #status.ok { color: var(--ok); }
+  #status.err { color: var(--err); }
+  .hp { position: absolute; left: -9999px; height: 0; overflow: hidden; }
+
+  .urgent {
+    margin-top: 28px; padding: 18px 22px;
+    border-left: 6px solid var(--accent); background: var(--paper);
+    border-radius: 0 16px 16px 0;
+  }
+  .urgent h2 { font-size: 1.1rem; margin: 0 0 6px; }
+  .urgent p { margin: 0; }
+  .urgent a { color: var(--ink); font-weight: 800; }
+  h2 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 16px; }
+  .menu { display: grid; gap: 14px; }
+  .big {
+    display: block; text-decoration: none; color: var(--ink);
+    background: var(--paper); border: 2px solid var(--line);
+    border-radius: 20px; padding: 20px 22px;
+  }
+  .big.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .big strong { display: block; font-size: 1.2rem; font-weight: 800; }
+  .big span { display: block; font-size: 0.95rem; opacity: 0.85; }
+  .big:hover { filter: brightness(0.97); }
+  .big:focus-visible, .back:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .back { display: inline-block; margin-bottom: 14px; color: var(--muted); font-weight: 600; }
+  .code {
+    font-size: clamp(2rem, 9vw, 2.8rem); font-weight: 800; letter-spacing: 0.14em;
+    text-align: center; padding: 20px; margin: 0 0 16px; user-select: all;
+    background: var(--note-bg); border: 2px dashed var(--line); border-radius: 18px;
+  }
+  .note { color: var(--muted); margin: 18px 0 24px; }
+  .msg { margin-top: 16px; font-weight: 600; text-align: center; min-height: 1.6em; }
+  .msg.err { color: var(--err); }
+  .answer {
+    margin-top: 18px; padding: 18px 20px; white-space: pre-wrap;
+    background: var(--note-bg); border: 2px solid var(--line); border-radius: 16px;
+  }
+</style>
+</head>
+<body>
+<main>
+  <div id="v-home" class="view">
+  <h1>Запитай про що завгодно. Анонімно або з ім’ям.</h1>
+  <p class="lead">Тут можна написати шкільному психологу про те, що тебе турбує: стосунки з друзями, навчання, сім’ю чи просто настрій. Ти сам(а) обираєш: написати анонімно чи підписатися, щоб я міг з тобою поговорити особисто.</p>
+
+  
+    <div class="menu">
+      <a class="big primary" href="#write" data-go="write"><strong>Написати психологу</strong><span>Задай питання або розкажи, що тебе турбує</span></a>
+      <a class="big" href="#check" data-go="check"><strong>Перевірити відповідь</strong><span>Для тих, у кого вже є особистий код</span></a>
+    </div>
+  </div>
+
+  <div id="v-write" class="view" hidden>
+    <a class="back" href="#home" data-go="home">Назад</a>
+    <form id="ask" novalidate>
+    <fieldset>
+      <legend>Як ти хочеш написати?</legend>
+      <div class="chips">
+        <input type="radio" name="mode" id="m1" value="Анонімно" checked><label for="m1">Анонімно</label>
+        <input type="radio" name="mode" id="m2" value="З ім’ям"><label for="m2">З ім’ям</label>
+      </div>
+    </fieldset>
+
+    <div class="field">
+      <label for="klass">У якому ти класі? <span class="hint">(необов’язково)</span></label>
+      <select id="klass" name="class">
+          <option value="">Не хочу вказувати</option>
+          <optgroup label="1 клас"><option value="1 клас">1 клас (без літери)</option><option value="1-А">1-А</option><option value="1-Б">1-Б</option><option value="1-В">1-В</option></optgroup>
+          <optgroup label="2 клас"><option value="2 клас">2 клас (без літери)</option><option value="2-А">2-А</option><option value="2-Б">2-Б</option><option value="2-В">2-В</option></optgroup>
+          <optgroup label="3 клас"><option value="3 клас">3 клас (без літери)</option><option value="3-А">3-А</option><option value="3-Б">3-Б</option><option value="3-В">3-В</option></optgroup>
+          <optgroup label="4 клас"><option value="4 клас">4 клас (без літери)</option><option value="4-А">4-А</option><option value="4-Б">4-Б</option><option value="4-В">4-В</option></optgroup>
+          <optgroup label="5 клас"><option value="5 клас">5 клас (без літери)</option><option value="5-А">5-А</option><option value="5-Б">5-Б</option><option value="5-В">5-В</option></optgroup>
+          <optgroup label="6 клас"><option value="6 клас">6 клас (без літери)</option><option value="6-А">6-А</option><option value="6-Б">6-Б</option><option value="6-В">6-В</option></optgroup>
+          <optgroup label="7 клас"><option value="7 клас">7 клас (без літери)</option><option value="7-А">7-А</option><option value="7-Б">7-Б</option><option value="7-В">7-В</option></optgroup>
+          <optgroup label="8 клас"><option value="8 клас">8 клас (без літери)</option><option value="8-А">8-А</option><option value="8-Б">8-Б</option><option value="8-В">8-В</option></optgroup>
+          <optgroup label="9 клас"><option value="9 клас">9 клас (без літери)</option><option value="9-А">9-А</option><option value="9-Б">9-Б</option><option value="9-В">9-В</option></optgroup>
+          <optgroup label="10 клас"><option value="10 клас">10 клас (без літери)</option><option value="10-А">10-А</option><option value="10-Б">10-Б</option><option value="10-В">10-В</option></optgroup>
+          <optgroup label="11 клас"><option value="11 клас">11 клас (без літери)</option><option value="11-А">11-А</option><option value="11-Б">11-Б</option><option value="11-В">11-В</option></optgroup>
+      </select>
+      <p class="hint" style="margin:6px 0 0">Це допоможе мені відповісти так, щоб було зрозуміло для твого віку.</p>
+    </div>
+
+    <div class="field">
+      <label for="message">Що ти хочеш розповісти чи запитати?</label>
+      <textarea id="message" name="message" maxlength="3000" required placeholder="Пиши так, як відчуваєш. Тут ніхто не оцінює."></textarea>
+    </div>
+
+    <div class="field">
+      <label class="check"><input type="checkbox" name="talk" value="Хоче поговорити особисто"><span>Я хочу поговорити особисто</span></label>
+      <p class="hint" id="talk-hint" style="margin:6px 0 0 34px"></p>
+    </div>
+
+    <div id="named-fields" hidden>
+      <div class="field">
+        <label for="realname">Твоє ім’я</label>
+        <input type="text" id="realname" name="name" maxlength="60" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="contact">Як з тобою зв’язатися? <span class="hint">(необов’язково)</span></label>
+        <input type="text" id="contact" name="contact" maxlength="80" autocomplete="off" placeholder="Телефон, месенджер або «підійду сама/сам»">
+      </div>
+    </div>
+
+    <div class="hp" aria-hidden="true">
+      <label>Не заповнюйте <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+    </div>
+
+    <button type="submit" id="send">Надіслати</button>
+    <p class="promise" id="promise">Я не бачу, хто ти. Це повідомлення читаю лише я.</p>
+    <div id="status" role="status" aria-live="polite"></div>
+  </form>
+  </div>
+
+  <div id="v-check" class="view" hidden>
+    <a class="back" href="#home" data-go="home">Назад</a>
+    <h2>Перевірити відповідь</h2>
+    <form id="check-form" novalidate>
+      <div class="field">
+        <label for="code-in">Твій особистий код</label>
+        <input type="text" id="code-in" maxlength="10" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Наприклад: K7M24QX">
+      </div>
+      <button type="submit" id="check-btn">Показати відповідь</button>
+      <div class="msg" id="check-msg" role="status" aria-live="polite"></div>
+      <div class="answer" id="answer" hidden></div>
+    </form>
+  </div>
+
+  <div id="v-done" class="view" hidden>
+    <h2>Надіслано. Ось твій особистий код</h2>
+    <div class="code" id="code-out"></div>
+    <button type="button" id="copy-btn">Скопіювати код</button>
+    <p class="note">Збережи його: запиши або сфотографуй екран. Я не знаю, хто ти, тому без коду відповідь не знайти. Коли я відповім, вона з’явиться на цьому сайті в розділі «Перевірити відповідь». Заходь і перевіряй час від часу.</p>
+    <div class="menu">
+      <a class="big" href="#check" data-go="check"><strong>Перевірити відповідь</strong></a>
+      <a class="big" href="#home" data-go="home"><strong>На головну</strong></a>
+    </div>
+  </div>
+
+  <section class="urgent" aria-labelledby="urgent-h">
+    <h2 id="urgent-h">Якщо тобі зараз дуже погано або ти в небезпеці</h2>
+    <p>Не чекай відповіді з сайту. Зателефонуй на <a href="tel:116111">116 111</a> (Національна дитяча лінія, безкоштовно) або на <a href="tel:112">112</a>. Також можна підійти до будь-якого дорослого, якому довіряєш.</p>
+  </section>
+</main>
+
+<script src="answers.js"></script>
+<script>
+  // ВАЖЛИВО: вставте сюди адресу вашої форми (див. інструкцію).
+  // Приклад для Formspree: "https://formspree.io/f/abcdwxyz"
+  const FORM_ENDPOINT = "https://formspree.io/f/ВАШ_КОД";
+
+  const form = document.getElementById("ask");
+  const statusEl = document.getElementById("status");
+  const btn = document.getElementById("send");
+
+  const namedBox = document.getElementById("named-fields");
+  const promise = document.getElementById("promise");
+  // Необов’язково: де вас знайти. Залиште порожнім, щоб не показувати.
+  // Приклад: "Мій кабінет №12, щодня з 9:00 до 15:00."
+  const OFFICE_TEXT = "";
+  const talkHint = document.getElementById("talk-hint");
+  const PROMISE_ANON = "Я не бачу, хто ти. Це повідомлення читаю лише я. Відповідь ти отримаєш за особистим кодом, який з’явиться після надсилання.";
+  const PROMISE_NAMED = "Це повідомлення читаю лише я. Я нікому не розповідатиму без твоєї згоди, окрім випадків, коли твоєму життю чи здоров’ю загрожує небезпека.";
+
+  function isNamed() {
+    return form.elements.mode.value === "З ім’ям";
+  }
+  function updateMode() {
+    const named = isNamed();
+    namedBox.hidden = !named;
+    promise.textContent = named ? PROMISE_NAMED : PROMISE_ANON;
+    talkHint.textContent = named
+      ? "Я сам знайду тебе і запропоную зручний час для розмови."
+      : "Щоб я сам тебе знайшов, вибери «З ім’ям». Або просто прийди до мене сам(а)" +
+        (OFFICE_TEXT ? ". " + OFFICE_TEXT : ", називати себе не обов’язково.");
+  }
+  form.querySelectorAll('input[name="mode"]').forEach((r) => r.addEventListener("change", updateMode));
+  updateMode();
+
+  function show(text, kind) {
+    statusEl.textContent = text;
+    statusEl.className = kind || "";
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+
+    if (data.get("website")) return; // захист від ботів
+    if (!String(data.get("message")).trim()) {
+      show("Напиши хоча б кілька слів, будь ласка.", "err");
+      document.getElementById("message").focus();
+      return;
+    }
+    if (isNamed()) {
+      if (!String(data.get("name")).trim()) {
+        show("Напиши своє ім’я або вибери «Анонімно».", "err");
+        document.getElementById("realname").focus();
+        return;
+      }
+    } else {
+      data.delete("name");
+      data.delete("contact");
+    }
+    if (FORM_ENDPOINT.includes("ВАШ_КОД")) {
+      show("Форму ще не підключено. Адміністратор сайту має вказати адресу у коді.", "err");
+      return;
+    }
+
+    const code = newCode();
+    data.set("code", code);
+    btn.disabled = true;
+    show("Надсилаю…");
+    try {
+      const res = await fetch(FORM_ENDPOINT, {
+        method: "POST",
+        headers: { "Accept": "application/json" },
+        body: data
+      });
+      if (!res.ok) throw new Error("bad status");
+      form.reset();
+      updateMode();
+      show("");
+      document.getElementById("code-out").textContent = code;
+      showView("done");
+    } catch (err) {
+      show("Не вдалося надіслати. Спробуй ще раз трохи пізніше.", "err");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // ---------- особистий код і перевірка відповіді ----------
+  const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // 32 символи, без схожих I, O, 0, 1
+  function newCode() {
+    const b = crypto.getRandomValues(new Uint8Array(7));
+    let c = "";
+    for (const x of b) c += ALPHABET[x & 31];
+    return c;
+  }
+  // кирилічні літери, схожі на латинські, на випадок неправильної розкладки
+  const LOOK = { "А":"A", "В":"B", "С":"C", "Е":"E", "Н":"H", "К":"K", "М":"M", "Р":"P", "Т":"T", "Х":"X" };
+  function normalize(v) {
+    return [...v.toUpperCase()].map((ch) => LOOK[ch] || ch).join("").replace(/[^A-Z0-9]/g, "");
+  }
+  async function derive(code) {
+    const enc = new TextEncoder();
+    const km = await crypto.subtle.importKey("raw", enc.encode(code), "PBKDF2", false, ["deriveBits"]);
+    const bits = new Uint8Array(await crypto.subtle.deriveBits(
+      { name: "PBKDF2", hash: "SHA-256", salt: enc.encode("shkilnyi-psykholoh-v1"), iterations: 200000 }, km, 384));
+    const id = [...bits.slice(0, 16)].map((x) => x.toString(16).padStart(2, "0")).join("");
+    const key = await crypto.subtle.importKey("raw", bits.slice(16), "AES-GCM", false, ["decrypt"]);
+    return { id, key };
+  }
+  async function lookup(code) {
+    const { id, key } = await derive(code);
+    const entry = (window.ANSWERS || {})[id];
+    if (!entry) return null;
+    try {
+      const raw = Uint8Array.from(atob(entry), (c) => c.charCodeAt(0));
+      const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: raw.slice(0, 12) }, key, raw.slice(12));
+      return new TextDecoder().decode(pt);
+    } catch (err) { return null; }
+  }
+
+  const checkForm = document.getElementById("check-form");
+  const checkMsg = document.getElementById("check-msg");
+  const answerEl = document.getElementById("answer");
+  checkForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    answerEl.hidden = true;
+    checkMsg.className = "msg";
+    const code = normalize(document.getElementById("code-in").value);
+    if (code.length !== 7) {
+      checkMsg.textContent = "Код має 7 символів, наприклад K7M24QX.";
+      checkMsg.className = "msg err";
+      return;
+    }
+    const cb = document.getElementById("check-btn");
+    cb.disabled = true;
+    checkMsg.textContent = "Шукаю…";
+    const text = await lookup(code);
+    cb.disabled = false;
+    if (text === null) {
+      checkMsg.textContent = "Відповіді за цим кодом поки немає. Перевір, чи правильно введено код, і зайди пізніше.";
+    } else {
+      checkMsg.textContent = "";
+      answerEl.textContent = text;
+      answerEl.hidden = false;
+    }
+  });
+
+  document.getElementById("copy-btn").addEventListener("click", async (e) => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById("code-out").textContent);
+      e.target.textContent = "Скопійовано";
+    } catch (err) {
+      e.target.textContent = "Виділи код і скопіюй вручну";
+    }
+  });
+
+  // ---------- екрани ----------
+  const VIEWS = ["home", "write", "check", "done"];
+  function showView(n) {
+    VIEWS.forEach((v) => { document.getElementById("v-" + v).hidden = v !== n; });
+    try { window.scrollTo(0, 0); } catch (err) {}
+  }
+  function route() {
+    const n = location.hash.slice(1);
+    showView(n === "write" || n === "check" ? n : "home");
+  }
+  // Переходи між екранами працюють по кліку, без залежності від адреси сторінки
+  document.querySelectorAll("a[data-go]").forEach((a) => {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      showView(a.dataset.go);
+    });
+  });
+  addEventListener("hashchange", route);
+  route();
+</script>
+</body>
+</html>
