@@ -238,7 +238,7 @@
 <script>
   // ВАЖЛИВО: вставте сюди адресу вашої форми (див. інструкцію).
   // Приклад для Formspree: "https://formspree.io/f/abcdwxyz"
-  const FORM_ENDPOINT = "https://formspree.io/f/xzerparl";
+  const FORM_ENDPOINT = "https://formspree.io/f/ВАШ_КОД";
 
   const form = document.getElementById("ask");
   const statusEl = document.getElementById("status");
@@ -246,9 +246,6 @@
 
   const namedBox = document.getElementById("named-fields");
   const promise = document.getElementById("promise");
-  // Необов’язково: де вас знайти. Залиште порожнім, щоб не показувати.
-  // Приклад: "Мій кабінет №12, щодня з 9:00 до 15:00."
-  const OFFICE_TEXT = "";
   const talkHint = document.getElementById("talk-hint");
   const PROMISE_ANON = "Я не бачу, хто ти. Це повідомлення читаю лише я. Відповідь ти отримаєш за особистим кодом, який з’явиться після надсилання.";
   const PROMISE_NAMED = "Це повідомлення читаю лише я. Я нікому не розповідатиму без твоєї згоди, окрім випадків, коли твоєму життю чи здоров’ю загрожує небезпека.";
@@ -274,8 +271,7 @@
       : "Це допоможе мені відповісти так, щоб було зрозуміло для твого віку.";
     talkHint.textContent = named
       ? "Я сам знайду тебе і запропоную зручний час для розмови."
-      : "Щоб я сам тебе знайшов, вибери «З ім’ям». Або просто прийди до мене сам(а)" +
-        (OFFICE_TEXT ? ". " + OFFICE_TEXT : ", називати себе не обов’язково.");
+      : "";
   }
   const talkBox = form.elements.talk;
   form.querySelectorAll('input[name="mode"]').forEach((r) => r.addEventListener("change", () => {
