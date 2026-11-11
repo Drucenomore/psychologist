@@ -237,7 +237,7 @@
     </div>
   </div>
 
-  <section class="urgent" aria-labelledby="urgent-h">
+  <section class="urgent" id="urgent" aria-labelledby="urgent-h" hidden>
     <h2 id="urgent-h">Якщо тобі зараз дуже погано або ти в небезпеці</h2>
     <p>Не чекай відповіді з сайту. Зателефонуй на <a href="tel:116111">116 111</a> (Національна дитяча лінія, безкоштовно) або на <a href="tel:112">112</a>. Також можна підійти до будь-якого дорослого, якому довіряєш.</p>
   </section>
@@ -246,7 +246,7 @@
 <script>
   // ВАЖЛИВО: вставте сюди адресу вашої форми (див. інструкцію).
   // Приклад для Formspree: "https://formspree.io/f/abcdwxyz"
-  const FORM_ENDPOINT = "https://formspree.io/f/xzerparl";
+  const FORM_ENDPOINT = "https://formspree.io/f/ВАШ_КОД";
 
   const form = document.getElementById("ask");
   const statusEl = document.getElementById("status");
@@ -412,6 +412,8 @@
   const VIEWS = ["home", "write", "check", "done"];
   function showView(n) {
     VIEWS.forEach((v) => { document.getElementById("v-" + v).hidden = v !== n; });
+    // Телефони допомоги показуємо лише там, де дитина пише, і після надсилання
+    document.getElementById("urgent").hidden = !(n === "write" || n === "done");
     try { window.scrollTo(0, 0); } catch (err) {}
   }
   function route() {
