@@ -243,11 +243,10 @@
   </section>
 </main>
 
-<script src="answers.js"></script>
 <script>
   // ВАЖЛИВО: вставте сюди адресу вашої форми (див. інструкцію).
   // Приклад для Formspree: "https://formspree.io/f/abcdwxyz"
-  const FORM_ENDPOINT = "https://formspree.io/f/xzerparl";
+  const FORM_ENDPOINT = "https://formspree.io/f/ВАШ_КОД";
 
   const form = document.getElementById("ask");
   const statusEl = document.getElementById("status");
@@ -352,7 +351,17 @@
     const key = await crypto.subtle.importKey("raw", bits.slice(16), "AES-GCM", false, ["decrypt"]);
     return { id, key };
   }
+  // Щоразу завантажуємо свіжий answers.js, щоб браузер не показував стару копію
+  function loadAnswers() {
+    return new Promise((resolve) => {
+      const sc = document.createElement("script");
+      sc.src = "answers.js?t=" + Date.now();
+      sc.onload = sc.onerror = () => { sc.remove(); resolve(); };
+      document.head.appendChild(sc);
+    });
+  }
   async function lookup(code) {
+    await loadAnswers();
     const { id, key } = await derive(code);
     const entry = (window.ANSWERS || {})[id];
     if (!entry) return null;
