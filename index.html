@@ -163,9 +163,9 @@
     </fieldset>
 
     <div class="field">
-      <label for="klass">У якому ти класі? <span class="hint">(необов’язково)</span></label>
+      <label for="klass">У якому ти класі? <span class="hint" id="klass-note">(необов’язково)</span></label>
       <select id="klass" name="class">
-          <option value="">Не хочу вказувати</option>
+          <option value="" id="klass-empty">Не хочу вказувати</option>
           <optgroup label="1 клас"><option value="1 клас">1 клас (без літери)</option><option value="1-А">1-А</option><option value="1-Б">1-Б</option><option value="1-В">1-В</option></optgroup>
           <optgroup label="2 клас"><option value="2 клас">2 клас (без літери)</option><option value="2-А">2-А</option><option value="2-Б">2-Б</option><option value="2-В">2-В</option></optgroup>
           <optgroup label="3 клас"><option value="3 клас">3 клас (без літери)</option><option value="3-А">3-А</option><option value="3-Б">3-Б</option><option value="3-В">3-В</option></optgroup>
@@ -178,7 +178,7 @@
           <optgroup label="10 клас"><option value="10 клас">10 клас (без літери)</option><option value="10-А">10-А</option><option value="10-Б">10-Б</option><option value="10-В">10-В</option></optgroup>
           <optgroup label="11 клас"><option value="11 клас">11 клас (без літери)</option><option value="11-А">11-А</option><option value="11-Б">11-Б</option><option value="11-В">11-В</option></optgroup>
       </select>
-      <p class="hint" style="margin:6px 0 0">Це допоможе мені відповісти так, щоб було зрозуміло для твого віку.</p>
+      <p class="hint" id="klass-hint" style="margin:6px 0 0">Це допоможе мені відповісти так, щоб було зрозуміло для твого віку.</p>
     </div>
 
     <div class="field">
@@ -196,10 +196,7 @@
         <label for="realname">Твоє ім’я</label>
         <input type="text" id="realname" name="name" maxlength="60" autocomplete="off">
       </div>
-      <div class="field">
-        <label for="contact">Як з тобою зв’язатися? <span class="hint">(необов’язково)</span></label>
-        <input type="text" id="contact" name="contact" maxlength="80" autocomplete="off" placeholder="Телефон, месенджер або «підійду сама/сам»">
-      </div>
+
     </div>
 
     <div class="hp" aria-hidden="true">
@@ -241,7 +238,7 @@
 <script>
   // ВАЖЛИВО: вставте сюди адресу вашої форми (див. інструкцію).
   // Приклад для Formspree: "https://formspree.io/f/abcdwxyz"
-  const FORM_ENDPOINT = "https://formspree.io/f/xzerparl";
+  const FORM_ENDPOINT = "https://formspree.io/f/ВАШ_КОД";
 
   const form = document.getElementById("ask");
   const statusEl = document.getElementById("status");
@@ -263,6 +260,18 @@
     const named = isNamed();
     namedBox.hidden = !named;
     promise.textContent = named ? PROMISE_NAMED : PROMISE_ANON;
+    // клас: у режимі «З ім’ям» обов’язковий і лише з буквою
+    const klass = document.getElementById("klass");
+    const letterless = /^\d+ клас$/;
+    klass.querySelectorAll("option").forEach((o) => {
+      if (letterless.test(o.value)) { o.disabled = named; o.hidden = named; }
+    });
+    if (named && !/^\d+-[АБВ]$/.test(klass.value)) klass.value = "";
+    document.getElementById("klass-empty").textContent = named ? "Обери свій клас" : "Не хочу вказувати";
+    document.getElementById("klass-note").textContent = named ? "(обов’язково)" : "(необов’язково)";
+    document.getElementById("klass-hint").textContent = named
+      ? "Обери клас з буквою, щоб я міг тебе знайти."
+      : "Це допоможе мені відповісти так, щоб було зрозуміло для твого віку.";
     talkHint.textContent = named
       ? "Я сам знайду тебе і запропоную зручний час для розмови."
       : "Щоб я сам тебе знайшов, вибери «З ім’ям». Або просто прийди до мене сам(а)" +
@@ -299,6 +308,11 @@
       return;
     }
     if (isNamed()) {
+      if (!String(data.get("class")).trim()) {
+        show("Обери свій клас із буквою.", "err");
+        document.getElementById("klass").focus();
+        return;
+      }
       if (!String(data.get("name")).trim()) {
         show("Напиши своє ім’я або вибери «Анонімно».", "err");
         document.getElementById("realname").focus();
@@ -306,7 +320,6 @@
       }
     } else {
       data.delete("name");
-      data.delete("contact");
     }
     if (FORM_ENDPOINT.includes("ВАШ_КОД")) {
       show("Форму ще не підключено. Адміністратор сайту має вказати адресу у коді.", "err");
