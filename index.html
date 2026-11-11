@@ -241,7 +241,7 @@
 <script>
   // ВАЖЛИВО: вставте сюди адресу вашої форми (див. інструкцію).
   // Приклад для Formspree: "https://formspree.io/f/abcdwxyz"
-  const FORM_ENDPOINT = "https://formspree.io/f/xzerparl";
+  const FORM_ENDPOINT = "https://formspree.io/f/ВАШ_КОД";
 
   const form = document.getElementById("ask");
   const statusEl = document.getElementById("status");
@@ -268,7 +268,19 @@
       : "Щоб я сам тебе знайшов, вибери «З ім’ям». Або просто прийди до мене сам(а)" +
         (OFFICE_TEXT ? ". " + OFFICE_TEXT : ", називати себе не обов’язково.");
   }
-  form.querySelectorAll('input[name="mode"]').forEach((r) => r.addEventListener("change", updateMode));
+  const talkBox = form.elements.talk;
+  form.querySelectorAll('input[name="mode"]').forEach((r) => r.addEventListener("change", () => {
+    // анонімно й особиста розмова несумісні, тому знімаємо галочку
+    if (!isNamed()) talkBox.checked = false;
+    updateMode();
+  }));
+  // «Хочу поговорити особисто» автоматично вмикає режим «З ім’ям»
+  talkBox.addEventListener("change", () => {
+    if (talkBox.checked) {
+      document.getElementById("m2").checked = true;
+      updateMode();
+    }
+  });
   updateMode();
 
   function show(text, kind) {
